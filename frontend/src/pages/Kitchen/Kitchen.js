@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Button, Table, Modal, Form } from 'react-bootstrap';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 const KitchenManagement = () => {
     const [orders, setOrders] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
     const [isConfirmedView, setIsConfirmedView] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [formData, setFormData] = useState({
@@ -21,7 +24,14 @@ const KitchenManagement = () => {
     useEffect(() => {
         fetchOrders();
     }, []);
+    const handleSearch = event => {
+        setSearchTerm(event.target.value);
+    };
 
+    const filteredOrders = orders.filter(order =>
+        order.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        order.item.toLowerCase().includes(searchTerm.toLowerCase())
+    );
     const fetchOrders = () => {
         fetch('http://localhost:8070/kitchen/')
             .then(response => response.json())
@@ -39,6 +49,29 @@ const KitchenManagement = () => {
             })
             .catch(error => console.error(error));
     };
+    const generateReport = () => {
+        const unit = 'pt';
+        const size = 'A4'; // Use A4 size for the PDF
+
+        const marginLeft = 40;
+        const doc = new jsPDF('p', unit, size);
+
+        doc.setFontSize(16);
+        const title = 'Kitchen Orders Report';
+        const headers = [['Order ID', 'Name', 'Item', 'Quantity', 'Status', 'Prepare']];
+        const data = orders.map(order => [order._id, order.name, order.item, order.quantity, order.status, order.prepare]);
+
+        let content = {
+            startY: 50,
+            head: headers,
+            body: data,
+            theme: 'grid'
+        };
+
+        doc.text(title, marginLeft, 40);
+        doc.autoTable(content);
+        doc.save('kitchen_orders_report.pdf');
+    };
 
     const confirmRemove = (orderId) => {
         setSelectedOrderId(orderId);
@@ -46,22 +79,22 @@ const KitchenManagement = () => {
     };
     const handleUpdateSubmit = (event) => {
         event.preventDefault();
-      
+
         fetch(`http://localhost:8070/kitchen/update/${selectedOrderId}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(formData),
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData),
         })
-          .then((response) => response.json())
-          .then((updatedOrder) => {
-            fetchOrders(); // Refresh orders after updating
-            setIsUpdateModalVisible(false); // Close the update modal
-          })
-          .catch((error) => console.error(error));
-      };
-      
+            .then((response) => response.json())
+            .then((updatedOrder) => {
+                fetchOrders(); // Refresh orders after updating
+                setIsUpdateModalVisible(false); // Close the update modal
+            })
+            .catch((error) => console.error(error));
+    };
+
     const handleRemoveOrder = () => {
         fetch(`http://localhost:8070/kitchen/delete/${selectedOrderId}`, {
             method: 'DELETE',
@@ -160,12 +193,22 @@ const KitchenManagement = () => {
 
     return (
         <div className="container mt-5">
+            <div className='d-flex justify-content-center'>
+            <input
+                    type="text"
+                    placeholder="Search..."
+                    value={searchTerm}
+                    onChange={handleSearch}
+                    className="form-control col-3 mb-2"
+                />
+
+            </div>
             <div className="mb-3 mx-1">
-                <Button variant="primary" className="mr-2" onClick={handleConfirmToggle}>
-                    {isConfirmedView ? 'View Pending' : 'View Confirmed'}
-                </Button>
                 <Button variant="success" className="mx-1" onClick={handleShowModal}>
                     Add Order
+                </Button>
+                <Button variant="primary" className="mx-2" onClick={generateReport}>
+                    Generate Report
                 </Button>
             </div>
 
@@ -183,8 +226,7 @@ const KitchenManagement = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {orders
-                        .map(order => (
+                {filteredOrders.map(order => (
                             <tr key={order._id}>
                                 <td>{order._id}</td>
                                 <td>{order.name}</td>

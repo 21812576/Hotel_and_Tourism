@@ -40,6 +40,7 @@ import ViewPackages from './pages/Packages/ViewPackages';
 import AdminViewPackages from './pages/Packages/AdminViewPackages';
 import UpdatePackage from './pages/Packages/UpdatPackage';
 import MyBookings from './pages/Bookings/MyBookings';
+import ClientEvent from './pages/Events/ClientEvent';
 
 function App() {
   return (
@@ -54,10 +55,10 @@ function App() {
               <Home />
             }
           />
-           <Route
+          <Route
             path="/userprofile"
             element={
-              <UserProfile/>
+              <UserProfile />
             }
           />
           <Route
@@ -106,7 +107,7 @@ function App() {
                   <SideBar />
                 </div>
                 <div className='col-10'>
-                  <AddPackage/>
+                  <AddPackage />
                 </div>
               </div>
             }
@@ -114,20 +115,14 @@ function App() {
           <Route
             path="/mybookings"
             element={
-              <div className='row'>
-                <div className='col-2'>
-                  <SideBar />
-                </div>
-                <div className='col-10'>
-                  <MyBookings/>
-                </div>
-              </div>
+              <MyBookings />
+
             }
           />
           <Route
             path="/viewpackages"
             element={
-                  <ViewPackages/>
+              <ViewPackages />
             }
           />
           <Route
@@ -138,7 +133,7 @@ function App() {
                   <SideBar />
                 </div>
                 <div className='col-10'>
-                  <AdminViewPackages/>
+                  <AdminViewPackages />
                 </div>
               </div>
             }
@@ -164,7 +159,7 @@ function App() {
                   <SideBar />
                 </div>
                 <div className='col-10'>
-                  <AddTourist/>
+                  <AddTourist />
                 </div>
               </div>
             }
@@ -177,12 +172,12 @@ function App() {
                   <SideBar />
                 </div>
                 <div className='col-10'>
-                  <ViewAllEvents/>
+                  <ViewAllEvents />
                 </div>
               </div>
             }
           />
-           <Route
+          <Route
             path="/addevent"
             element={
               <div className='row'>
@@ -190,12 +185,12 @@ function App() {
                   <SideBar />
                 </div>
                 <div className='col-10'>
-                  <AddEvent/>
+                  <AddEvent />
                 </div>
               </div>
             }
           />
-           <Route
+          <Route
             path="/viewevents"
             element={
               <div className='row'>
@@ -203,7 +198,7 @@ function App() {
                   <SideBar />
                 </div>
                 <div className='col-10'>
-                  <ViewAllEvents/>
+                  <ViewAllEvents />
                 </div>
               </div>
             }
@@ -216,7 +211,7 @@ function App() {
                   <SideBar />
                 </div>
                 <div className='col-10'>
-                  <UpdateEvent/>
+                  <UpdateEvent />
                 </div>
               </div>
             }
@@ -229,7 +224,7 @@ function App() {
                   <SideBar />
                 </div>
                 <div className='col-10'>
-                  <InventoryManagement/>
+                  <InventoryManagement />
                 </div>
               </div>
             }
@@ -242,23 +237,22 @@ function App() {
                   <SideBar />
                 </div>
                 <div className='col-10'>
-                  <KitchenManagement/>
+                  <KitchenManagement />
                 </div>
               </div>
             }
           />
           <Route
+            path="/event"
+            element={
+                  <ClientEvent/>
+                }
+          />
+          <Route
             path="/order"
             element={
-              <div className='row'>
-                <div className='col-2'>
-                  <SideBar />
-                </div>
-                <div className='col-10'>
-                  <ClientOrderManagement/>
-                </div>
-              </div>
-            }
+                  <ClientOrderManagement />
+                }
           />
           <Route
             path="/addmaintainance"
@@ -268,7 +262,7 @@ function App() {
                   <SideBar />
                 </div>
                 <div className='col-10'>
-                  <MaintenanceForm/>
+                  <MaintenanceForm />
                 </div>
               </div>
             }
@@ -281,7 +275,7 @@ function App() {
                   <SideBar />
                 </div>
                 <div className='col-10'>
-                  <AllMaintenance/>
+                  <AllMaintenance />
                 </div>
               </div>
             }
@@ -294,7 +288,7 @@ function App() {
                   <SideBar />
                 </div>
                 <div className='col-10'>
-                  <UpdatePackage/>
+                  <UpdatePackage />
                 </div>
               </div>
             }
@@ -307,12 +301,12 @@ function App() {
                   <SideBar />
                 </div>
                 <div className='col-10'>
-                  <UpdateMaintenance/>
+                  <UpdateMaintenance />
                 </div>
               </div>
             }
           />
-            <Route
+          <Route
             path="/addstaff"
             element={
               <div className='row'>
@@ -320,12 +314,12 @@ function App() {
                   <SideBar />
                 </div>
                 <div className='col-10'>
-                  <AddStaff/>
+                  <AddStaff />
                 </div>
               </div>
             }
           />
-           <Route
+          <Route
             path="/viewstaff"
             element={
               <div className='row'>
@@ -333,7 +327,7 @@ function App() {
                   <SideBar />
                 </div>
                 <div className='col-10'>
-                  <ViewStaff/>
+                  <ViewStaff />
                 </div>
               </div>
             }
@@ -346,7 +340,7 @@ function App() {
                   <SideBar />
                 </div>
                 <div className='col-10'>
-                  <UpdateStaff/>
+                  <UpdateStaff />
                 </div>
               </div>
             }
@@ -359,7 +353,7 @@ function App() {
                   <SideBar />
                 </div>
                 <div className='col-10'>
-                  <Attendance/>
+                  <Attendance />
                 </div>
               </div>
             }
@@ -372,7 +366,7 @@ function App() {
                   <SideBar />
                 </div>
                 <div className='col-10'>
-                  <AddAttendance/>
+                  <AddAttendance />
                 </div>
               </div>
             }
@@ -380,7 +374,7 @@ function App() {
           <Route
             path="/addreservation"
             element={
-                  <AddReservation/>
+              <AddReservation />
             }
           />
           <Route
@@ -391,7 +385,7 @@ function App() {
                   <SideBar />
                 </div>
                 <div className='col-10'>
-                  <AddRooms/>
+                  <AddRooms />
                 </div>
               </div>
             }
@@ -404,7 +398,7 @@ function App() {
                   <SideBar />
                 </div>
                 <div className='col-10'>
-                  <ViewRooms/>
+                  <ViewRooms />
                 </div>
               </div>
             }
@@ -417,7 +411,7 @@ function App() {
                   <SideBar />
                 </div>
                 <div className='col-10'>
-                  <UpdateRooms/>
+                  <UpdateRooms />
                 </div>
               </div>
             }
@@ -430,7 +424,7 @@ function App() {
                   <SideBar />
                 </div>
                 <div className='col-10'>
-                  <ViewFinance/>
+                  <ViewFinance />
                 </div>
               </div>
             }
@@ -443,7 +437,7 @@ function App() {
                   <SideBar />
                 </div>
                 <div className='col-10'>
-                  <AddExpensesIncome/>
+                  <AddExpensesIncome />
                 </div>
               </div>
             }

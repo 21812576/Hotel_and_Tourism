@@ -1,5 +1,6 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Link } from 'react-router-dom'; 
 import { faPhone, faComments, faEnvelope, faStar, faEllipsisH } from '@fortawesome/free-solid-svg-icons';
 
 export default function Footer() {
@@ -79,6 +80,8 @@ export default function Footer() {
                                 <li className="list-inline-item">
                                     <a href="#">Terms of Use</a>
                                 </li>
+
+                                <Link to="/viewallevents" className="btn btn-primary col-3">Manager </Link>
                             </ul>
                         </div>
                     </div>

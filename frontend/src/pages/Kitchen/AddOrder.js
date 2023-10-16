@@ -39,7 +39,7 @@ const ClientOrderManagement = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [orderDetails, setOrderDetails] = useState({
-    name: 'Test', // Default user's name
+    name: '', // Allow user to input their name
     item: '',
     quantity: 1,
   });

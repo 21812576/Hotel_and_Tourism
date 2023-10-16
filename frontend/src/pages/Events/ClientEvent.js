@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
-
-export default function ViewAllEvents() {
+import { Modal, Form, Button } from 'react-bootstrap';
+import Cookies from 'js-cookie';
+export default function ClientEvent() {
+    const navigate = useNavigate();
     const [events, setEvents] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [deleteConfirmation, setDeleteConfirmation] = useState(null);
+    const [selectedEvent, setSelectedEvent] = useState(null);
+    const [showModal, setShowModal] = useState(false);
+    const userId = Cookies.get('userId');
+    const [userData, setUserData] = useState(null);
     const cardStyles = {
         boxShadow: '3px 3px 11px 1.5px #0000002b',
         borderRadius: '10px',
@@ -56,6 +60,45 @@ export default function ViewAllEvents() {
         fontWeight: '300',
         fontSize: '1rem',
     };
+    const handleReserveTickets = (event) => {
+        if (!userId) {
+            navigate('/signin');
+        } else {
+            setSelectedEvent(event);
+            setShowModal(true);
+        }
+    };
+    const handleModalClose = () => {
+        setShowModal(false);
+        setSelectedEvent(null);
+    };
+
+    const handleFormSubmit = (event) => {
+        event.preventDefault();
+
+        // Prepare the data for the API call
+        const formData = {
+            userId: userId,
+            eventId: selectedEvent.id,
+            quantity: 1, // You can allow the user to input the quantity if needed
+        };
+
+        fetch('http://localhost:8070/tickets/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                console.log('Ticket reservation added successfully:', data);
+                handleModalClose();
+            })
+            .catch((error) => {
+                console.error('Error adding ticket reservation:', error);
+            });
+    };
     const formatDate = (dateString, format = 'default') => {
         const options = {
             year: 'numeric',
@@ -82,64 +125,25 @@ export default function ViewAllEvents() {
             return date.toLocaleDateString(undefined, options);
         }
     };
-    const handleDelete = async (eventId) => {
-        try {
-            const response = await fetch(`http://localhost:8070/events/delete/${eventId}`, {
-                method: 'DELETE',
-            });
-            if (response.ok) {
-                // Refresh events after successful deletion
-                const updatedEvents = events.filter(event => event._id !== eventId);
-                setEvents(updatedEvents);
-                setDeleteConfirmation(null); // Close delete confirmation modal
-            } else {
-                console.error('Error deleting event');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    };
-    const generateReport = () => {
-        // Create a new jsPDF instance
-        const doc = new jsPDF();
-
-        // Define the table headers and rows
-        const headers = [['Title', 'Venue', 'Date']];
-        const rows = filteredEvents.map(event => [
-            event.title,
-            event.venue,
-            formatDate(event.date, 'custom') // Format the date as needed
-        ]);
-
-        // Add the table to the PDF document
-        doc.autoTable({
-            head: headers,
-            body: rows,
-            startY: 20,
-            margin: { horizontal: 10 },
-        });
-
-        // Save the PDF file with a specific name
-        doc.save('events_report.pdf');
-    };
-
-    const handleDeleteConfirmation = (eventId) => {
-        setDeleteConfirmation(eventId);
-    };
     useEffect(() => {
         // Fetch events from the API endpoint
         fetch('http://localhost:8070/events/')
             .then(response => response.json())
             .then(data => setEvents(data))
             .catch(error => console.error('Error:', error));
-    }, []);
-
+        if (userId) {
+            fetch(`http://localhost:8070/user/get/${userId}`)
+                .then(response => response.json())
+                .then(data => setUserData(data))
+                .catch(error => console.error('Error fetching user data:', error));
+        }
+    }, [userId]);
     const filteredEvents = events.filter(event =>
         event.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
-        <div className='container'>
+        <div className='container' style={{ minHeight: '100vh' }}>
             <h3>All Events</h3>
             <div className='d-flex justify-content-start col-12'>
                 <form className='form-inline'>
@@ -152,7 +156,6 @@ export default function ViewAllEvents() {
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
-                        <button className='btn btn-primary my-3' onClick={generateReport}>Generate Report</button>
                     </div>
                 </form>
                 <div className='row d-flex justify-content-start'>
@@ -203,11 +206,14 @@ export default function ViewAllEvents() {
                                                     {event.hasTicket && <span className="badge text-uppercase text-bg-primary">Tickets Remaining : {event.ticketAmount}</span>}
                                                 </span>
                                             </div>
-                                            <div className="card-footer">
-                                                <span className="badge rounded-pill text-bg-time">
-                                                    <Link to={`/updateevent/${event._id}`} ><button className='btn btn-primary mx-2'>Update</button></Link>
-                                                    <button className='btn btn-danger mx-2' onClick={() => handleDeleteConfirmation(event._id)}>Delete</button>
-                                                </span>
+                                            <div className='card-footer' key={event.id}>
+                                                {event.hasTicket && (
+                                                    <span className='badge rounded-pill text-bg-time'>
+                                                        <button className='btn btn-primary' onClick={() => handleReserveTickets(event)}>
+                                                            Reserve Tickets
+                                                        </button>
+                                                    </span>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
@@ -215,21 +221,29 @@ export default function ViewAllEvents() {
 
                             </div>
                         </div>
-                        {deleteConfirmation && (
-                            <div className="modal" tabIndex="-1" role="dialog" style={{ display: 'block', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
-                                <div className="modal-dialog" role="document">
-                                    <div className="modal-content">
-                                        <div className="modal-body">
-                                            <p>Are you sure you want to delete this event?</p>
-                                        </div>
-                                        <div className="modal-footer">
-                                            <button type="button" className="btn btn-secondary" data-dismiss="modal" onClick={() => setDeleteConfirmation(null)}>Cancel</button>
-                                            <button type="button" className="btn btn-danger" onClick={() => handleDelete(deleteConfirmation)}>Delete</button>
-                                        </div>
+                        <Modal show={showModal} onHide={handleModalClose}>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Reserve Tickets</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                {userData && selectedEvent && (
+                                    <div>
+                                        <p>User: {userData.firstname+' '+userData.lastname}</p>
+                                        <p>Event: {selectedEvent.name}</p>
+                                        <Form onSubmit={handleFormSubmit}>
+                                            <Form.Group controlId='ticketQuantity'>
+                                                <Form.Label>Quantity</Form.Label>
+                                                <Form.Control type='number' defaultValue={1} min={1} required />
+                                            </Form.Group>
+                                            <Button variant='primary' className="mt-2" type='submit'>
+                                                Reserve
+                                            </Button>
+                                        </Form>
                                     </div>
-                                </div>
-                            </div>
-                        )}
+                                )}
+                            </Modal.Body>
+                        </Modal>
+
                     </section>
                 </div>
             )}

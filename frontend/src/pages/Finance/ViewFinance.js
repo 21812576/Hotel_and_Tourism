@@ -131,12 +131,12 @@ const ViewFinance = () => {
     const fetchData = async () => {
         try {
             const [roomResponse, kitchenResponse, staffResponse, maintenanceResponse, inventoryResponse] =
-                await Promise.all([
+                await Promise.all([ 
                     axios.get('http://localhost:8070/rooms/'),
                     axios.get('http://localhost:8070/kitchen/'),
                     axios.get('http://localhost:8070/staff/'),
                     axios.get('http://localhost:8070/maintenance/'),
-                    axios.get('http://localhost:8070/inventory/')
+                    axios.get('http://localhost:8070/inventory/')  
                 ]);
             // Calculate total income without using reduce
             const calculatedRoomIncome = roomResponse.data.reduce((total, item) => total + item.total, 0);
@@ -182,23 +182,16 @@ const ViewFinance = () => {
         }
     };
     const data = {
-        labels: ['Income', 'Expenses'],
-        datasets: [
-            {
-                label: '# of Votes',
-                data: [totalIncome, totalExpenses],
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                ],
-                borderWidth: 1,
-            },
-        ],
-    };
+    labels: ['Income', 'Expenses'], 
+    datasets: [
+        {
+            data: [totalIncome, totalExpenses],
+            backgroundColor: ['rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)'],
+            borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)'],
+            borderWidth: 1,
+        },
+    ],
+};
     const handleUpdateFinance = async () => {
         try {
             const response = await axios.put('http://localhost:8070/finance/fetched', {

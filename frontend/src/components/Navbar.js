@@ -78,8 +78,8 @@ export default function Navbar() {
                                                 </Link>
                                             </li>
                                             <li className="nav-item">
-                                                <Link style={styles.navLink} className="nav-link" to="">
-                                                    About
+                                                <Link style={styles.navLink} className="nav-link" to="/event">
+                                                    Events
                                                 </Link>
                                             </li>
                                             <li className="nav-item">
@@ -88,8 +88,8 @@ export default function Navbar() {
                                                 </Link>
                                             </li>
                                             <li className="nav-item">
-                                                <Link style={styles.navLink} className="nav-link" to="">
-                                                    Gallery
+                                                <Link style={styles.navLink} className="nav-link" to="/order">
+                                                    Bakery
                                                 </Link>
                                             </li>
                                             <li className="nav-item">

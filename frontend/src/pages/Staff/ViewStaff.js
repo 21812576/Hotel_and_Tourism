@@ -118,6 +118,7 @@ const ViewStaff = () => {
                         />
                     </div>
                     <button className='btn btn-primary my-3' onClick={generateReport}>Generate a Report</button>
+                    <Link to="/staff/attendance/"className='btn btn-success my-3' >Attendance</Link>
                 </div>
 
                 <table className="table table-striped table-dark">

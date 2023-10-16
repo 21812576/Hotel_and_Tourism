@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrash, faStreetView } from '@fortawesome/free-solid-svg-icons';
 import ReactPaginate from 'react-paginate';
-import { Link, useNavigate  } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
 
-const PAGE_SIZE = 5; // Number of items per page, you can set any count here
+const PAGE_SIZE = 5;
 
 const inputStyle = {
     borderWidth: '0',
@@ -61,50 +61,61 @@ const activePageLinkStyle = {
     border: '1px solid #007bff',
 };
 
-const generateExampleTourists = (count) => {
-    const tourists = [];
-    for (let i = 1; i <= count; i++) {
-        tourists.push({
-            id: i,
-            firstName: `Tourist ${i}`,
-            lastName: 'Doe',
-            email: `tourist${i}@example.com`,
-            phone: '123-456-7890',
-        });
-    }
-    return tourists;
-};
-
-export default function HomeTourists() {
+const HomeTourists = () => {
     const navigate = useNavigate();
+    const [tourists, setTourists] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
     const [searchTerm, setSearchTerm] = useState('');
-    const totalCount = 2; // Set the total number of tourists you want to display
-    const tourists = generateExampleTourists(totalCount);
     const [selectedTouristId, setSelectedTouristId] = useState(null);
     const [showModal, setShowModal] = useState(false);
-    const [modalConfirmed, setModalConfirmed] = useState(false);
     const [selectedTourist, setSelectedTourist] = useState(null);
+    const [filteredTourists, setFilteredTourists] = useState([]);
 
     const handlePageChange = ({ selected }) => {
         setCurrentPage(selected);
     };
 
+    useEffect(() => {
+        fetchTourists();
+    }, []); // Fetch tourists when the component mounts
+
+    const fetchTourists = () => {
+        fetch('http://localhost:8070/user/')
+            .then(response => response.json())
+            .then(data => {
+                setTourists(data);
+                setFilteredTourists(data); // Set initial filtered data
+            })
+            .catch(error => console.error('Error fetching tourists:', error));
+    };
+
     const handleRemoveClick = (touristId) => {
         setSelectedTouristId(touristId);
         setShowModal(true);
+        // Rest of your remove logic
     };
-
+    const handleSearchChange = (e) => {
+        const query = e.target.value.toLowerCase();
+    
+        const filtered = tourists.filter((tourist) =>
+            tourist.firstname.toLowerCase().includes(query) ||
+            tourist.lastname.toLowerCase().includes(query) ||
+            tourist.email.toLowerCase().includes(query) ||
+            tourist.contact.includes(query)
+        );
+    
+        setFilteredTourists(filtered);
+        setSearchTerm(query);
+    };
     const handleConfirmRemove = () => {
-        fetch(`http://localhost:8070/tourists/delete/${selectedTouristId}`, {
+        fetch(`http://localhost:8070/tourists/user/delete/${selectedTouristId}`, {
             method: 'DELETE',
         })
             .then(response => {
                 if (response.ok) {
                     setShowModal(false);
                     setSelectedTouristId(null);
-                    setModalConfirmed(true);
-                    navigate('/tourists');
+                    // Rest of your confirmation logic
                 } else {
                     console.error('Error removing tourist');
                 }
@@ -113,15 +124,9 @@ export default function HomeTourists() {
                 console.error('Error removing tourist:', error);
             });
     };
-
-
+    console.log("Filtered Tourists:", filteredTourists);
 
     const offset = currentPage * PAGE_SIZE;
-    const filteredTourists = tourists.filter(
-        (tourist) =>
-            tourist.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            tourist.lastName.toLowerCase().includes(searchTerm.toLowerCase())
-    );
     const paginatedTourists = filteredTourists.slice(offset, offset + PAGE_SIZE);
 
     return (
@@ -135,13 +140,12 @@ export default function HomeTourists() {
                         <div className="row mb-4">
                             <div className="form-group col-md-9">
                                 <input
-                                    id="exampleFormControlInput5"
                                     type="text"
                                     placeholder="Search a Tourist"
                                     className="form-control form-control-underlined"
                                     style={inputStyle}
                                     value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    onChange={handleSearchChange}
                                 />
                             </div>
                             <div className="form-group col-md-3">
@@ -153,7 +157,7 @@ export default function HomeTourists() {
                     </form>
                 </div>
                 <div className='col-3'>
-                   <Link to="/addtourist"><button className='btn btn-primary'>Add +</button></Link> 
+                    <Link to="/addtourist"><button className='btn btn-primary'>Add +</button></Link>
                 </div>
             </div>
             <table className="table table-dark">
@@ -169,13 +173,13 @@ export default function HomeTourists() {
                     </tr>
                 </thead>
                 <tbody>
-                    {paginatedTourists.map((tourist) => (
-                        <tr key={tourist.id}>
-                            <th scope="row">{tourist.id}</th>
-                            <td>{tourist.firstName}</td>
-                            <td>{tourist.lastName}</td>
+                    {filteredTourists.map((tourist) => (
+                        <tr key={tourist._id}>
+                            <th scope="row">{tourist._id}</th>
+                            <td>{tourist.firstname}</td>
+                            <td>{tourist.lastname}</td>
                             <td>{tourist.email}</td>
-                            <td>{tourist.phone}</td>
+                            <td>{tourist.contact}</td>
                             <td>
                                 <Link to="/touristslog"><FontAwesomeIcon icon={faStreetView} className="text-primary m-1" style={{ fontSize: 25 }} /></Link>
                             </td>
@@ -222,20 +226,22 @@ export default function HomeTourists() {
                     />
                 </div>
                 <Modal show={showModal} onHide={() => setShowModal(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Confirmation</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>Are you sure you want to remove {selectedTourist?.firstName}?</Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowModal(false)}>
-                        Close
-                    </Button>
-                    <Button variant="danger" onClick={handleConfirmRemove}>
-                        Confirm
-                    </Button>
-                </Modal.Footer>
-            </Modal>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Confirmation</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>Are you sure you want to remove {selectedTourist?.firstName}?</Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => setShowModal(false)}>
+                            Close
+                        </Button>
+                        <Button variant="danger" onClick={handleConfirmRemove}>
+                            Confirm
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
             </div>
         </div>
     );
 }
+
+export default HomeTourists;

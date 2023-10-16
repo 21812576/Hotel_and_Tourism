@@ -90,6 +90,7 @@ const ViewRooms = () => {
           placeholder="Search..."
           onChange={(e) => setSearchTerm(e.target.value)}
         />
+        <Link to="/addrooms" className='btn btn-success col-3 mx-2 my-2'>Add Reservations</Link>
         <button className='btn btn-success col-3 my-1' onClick={generatePDF}>
           Generate PDF Report
         </button>

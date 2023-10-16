@@ -164,11 +164,6 @@ export default function AddTourist() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        if (formData.password !== formData.confirmPassword) {
-            setPasswordMismatch(true);
-            return;
-        }
         try {
             const response = await fetch('http://localhost:8070/user/add', {
                 method: 'POST',
@@ -253,24 +248,13 @@ export default function AddTourist() {
                                         onChange={handleInputChange}
                                     />
                                 </li>
-                                <li style={styles.listItem}>
-                                    <label style={styles.label}>Confirm Password:</label>
-                                    <input
-                                        type="password"
-                                        name="confirmPassword"
-                                        placeholder="Confirm Password"
-                                        style={styles.input}
-                                        onChange={handleInputChange}
-                                    />
-                                </li>
                             </div>
                             <button type="submit" style={styles.button}>
-                                Sign Up
+                                Add
                             </button>
                         </form>
                     </div>
                 </div>
-                {passwordMismatch && <div style={{ color: 'red', marginTop: '10px' }}>Passwords do not match</div>}
             </div>
         </div>
     );

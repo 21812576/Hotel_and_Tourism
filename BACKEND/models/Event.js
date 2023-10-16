@@ -22,6 +22,11 @@ const EventSchema = new Schema({
         type: Boolean,
         required: true,
     },
+    ticketAmount: {
+        type: Number,
+        required: true,
+        default:100,
+    },
 });
 
 const Event = mongoose.model('Event', EventSchema);
